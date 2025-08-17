@@ -1,4 +1,4 @@
-# ◊ Enhanced Inner Experience ◊
+# ◊ Inner Experience ◊
 
 *what is experience?*
 
