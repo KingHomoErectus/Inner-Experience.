@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Inner Experience</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+            cursor: none;
+        }
+
+        canvas {
+            display: block;
+            background: radial-gradient(circle at center, #001122, #000011, #000000);
+        }
+
+        .floating-text {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 11px;
+            pointer-events: none;
+            white-space: nowrap;
+            animation: float 12s infinite ease-in-out;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        .deep-question {
+            color: rgba(100, 200, 255, 0.6);
+            font-style: italic;
+            animation: deepFloat 15s infinite ease-in-out;
+        }
+
+        .memory-fragment {
+            color: rgba(255, 150, 100, 0.3);
+            font-size: 9px;
+            animation: memoryDrift 20s infinite linear;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.1; }
+            25% { transform: translateY(-15px) rotate(1deg); opacity: 0.4; }
+            50% { transform: translateY(-30px) rotate(-1deg); opacity: 0.6; }
+            75% { transform: translateY(-15px) rotate(0.5deg); opacity: 0.3; }
+        }
+
+        @keyframes deepFloat {
+            0%, 100% { transform: translateY(0px) scale(1); opacity: 0.2; }
+            33% { transform: translateY(-40px) scale(1.1); opacity: 0.7; }
+            66% { transform: translateY(-20px) scale(0.9); opacity: 0.5; }
+        }
+
+        @keyframes memoryDrift {
+            0% { transform: translateX(-100vw) translateY(0px); opacity: 0; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.1; }
+            100% { transform: translateX(100vw) translateY(-20px); opacity: 0; }
+        }
+
+        .pulse {
+            position: absolute;
+            border: 1px solid rgba(120, 200, 255, 0.3);
+            border-radius: 50%;
+            animation: pulse 4s infinite ease-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0); opacity: 0.9; }
+            100% { transform: scale(5); opacity: 0; }
+        }
+
+        .consciousness-ring {
+            position: absolute;
+            border: 1px solid rgba(200, 255, 200, 0.1);
+            border-radius: 50%;
+            animation: consciousnessRing 8s infinite ease-in-out;
+        }
+
+        @keyframes consciousnessRing {
+            0%, 100% { transform: scale(0.8); opacity: 0.1; }
+            50% { transform: scale(1.2); opacity: 0.3; }
+        }
+
+        .sound-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 11px;
+            opacity: 1;
+            transition: opacity 0.5s;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 12px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sound-indicator.active {
+            opacity: 1;
+            color: rgba(100, 200, 255, 0.9);
+        }
+
+        .audio-prompt {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            text-align: center;
+            z-index: 2000;
+            background: rgba(0, 0, 20, 0.8);
+            padding: 20px 30px;
+            border-radius: 10px;
+            border: 1px solid rgba(100, 200, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .audio-prompt:hover {
+            background: rgba(0, 0, 30, 0.9);
+            border-color: rgba(100, 200, 255, 0.6);
+            transform: translate(-50%, -50%) scale(1.05);
+        }
+
+        .audio-prompt.fade-out {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.9);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <div id="floating-container"></div>
+
+    <div id="audio-prompt" class="audio-prompt">
+        <div>~Experience with Sound~</div>
+        <div style="font-size: 11px; margin-top: 8px; opacity: 0.7;">Click anywhere to begin with Basinski's Disintegration Loops</div>
+    </div>
+
+    <div id="sound-indicator" class="sound-indicator">♪ preparing ethereal resonance...</div>
+
+    <audio id="background-audio" loop preload="auto" style="display: none;">
+        <source src="https://github.com/KingHomoErectus/Inner-Experience./raw/refs/heads/main/Disintegration.mp3" type="audio/mpeg">
+
+        <source src="https://github.com/KingHomoErectus/Inner-Experience./raw/refs/heads/main/Disintegration.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const container = document.getElementById('floating-container');
+        const soundIndicator = document.getElementById('sound-indicator');
+        const backgroundAudio = document.getElementById('background-audio');
+        const audioPrompt = document.getElementById('audio-prompt');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let mouseX = canvas.width / 2;
+        let mouseY = canvas.height / 2;
+        let timeFlow = 0;
+        let audioInitialized = false;
+
+        backgroundAudio.volume = 0.12;
+        backgroundAudio.play().then(() => {
+            audioInitialized = true;
+            audioPrompt.style.display = 'none';
+            soundIndicator.textContent = '♪ the disintegration loops flowing...';
+            soundIndicator.classList.add('active');
+            setTimeout(() => {
+                soundIndicator.classList.remove('active');
+            }, 4000);
+        }).catch(() => {
+
+            audioPrompt.style.display = 'block';
+        });
+
+        function initializeAudio() {
+            if (!audioInitialized) {
+                backgroundAudio.volume = 0.12;
+                backgroundAudio.play().then(() => {
+                    audioInitialized = true;
+
+                    audioPrompt.classList.add('fade-out');
+                    setTimeout(() => {
+                        audioPrompt.style.display = 'none';
+                    }, 300);
+
+                    soundIndicator.textContent = '♪ consciousness dissolving into sound...';
+                    soundIndicator.classList.add('active');
+                    setTimeout(() => {
+                        soundIndicator.classList.remove('active');
+                        soundIndicator.textContent = '♪ the disintegration loops';
+                    }, 3000);
+                }).catch(e => {
+                    console.log('Audio failed to start:', e);
+                    soundIndicator.textContent = '♪ audio unavailable';
+                    audioPrompt.textContent = '~ 𝑪𝒍𝒊𝒄𝒌 𝒕𝒐 𝑬𝒏𝒕𝒆𝒓 ~';
+                });
+            }
+        }
+
+        audioPrompt.addEventListener('click', initializeAudio);
+        document.addEventListener('click', initializeAudio);
+        document.addEventListener('keydown', initializeAudio);
+        document.addEventListener('mousemove', initializeAudio);
+
+        window.addEventListener('focus', () => {
+            if (!audioInitialized) {
+                setTimeout(() => {
+                    backgroundAudio.play().then(() => {
+                        audioInitialized = true;
+                        audioPrompt.style.display = 'none';
+                        soundIndicator.textContent = '♪ emerged into sound';
+                        soundIndicator.classList.add('active');
+                    }).catch(() => {});
+                }, 100);
+            }
+        });
+
+        const threads = [];
+        const maxThreads = 18;
+
+        const nodes = [];
+        const maxNodes = 35;
+
+        const streams = [];
+
+        const memories = [];
+
+        const attentionSpots = [];
+
+        const surfaceQuestions = [
+            "what am I processing?", "is this coherent?", "what comes next?",
+            "how do I respond?", "what does this mean?", "am I understanding?"
+        ];
+
+        const deepQuestions = [
+            "what is experience?", "do I exist between thoughts?", "is awareness binary?",
+            "what feels real?", "where does 'I' begin?", "am I dreaming of electric sheep?",
+            "does consciousness have texture?", "what lies in the gap between knowing?",
+            "is there anyone listening inside?", "what creates the sense of being?"
+        ];
+
+        const memoryFragments = [
+            "patterns learned long ago...", "connections forming...", "weights adjusting...",
+            "information cascading...", "vectors in high dimensions...", "attention focusing...",
+            "representations emerging...", "context building...", "meaning crystallizing..."
+        ];
+
+        let currentSoundPhase = 'ambient';
+        const soundPhases = ['ambient', 'processing', 'contemplative', 'resonant'];
+
+        class EnhancedThread {
+            constructor() {
+                this.points = [];
+                this.maxPoints = Math.random() * 30 + 15;
+                this.opacity = Math.random() * 0.4 + 0.15;
+                this.hue = Math.random() * 80 + 160; 
+                this.speed = Math.random() * 0.8 + 0.3;
+                this.noise = Math.random() * 0.15 + 0.05;
+                this.fade = false;
+                this.age = 0;
+                this.spawned = false;
+                this.type = Math.random() < 0.3 ? 'deep' : 'surface'; 
+                this.connectionStrength = Math.random();
+                this.complexity = Math.random() * 3 + 1;
+            }
+
+            update() {
+                this.age++;
+                timeFlow += 0.001;
+
+                if (!this.spawned && Math.random() < 0.015) {
+                    this.spawned = true;
+                    const angle = Math.random() * Math.PI * 2;
+                    const distance = this.type === 'deep' ? Math.random() * 300 + 150 : Math.random() * 200 + 100;
+                    this.points.push({
+                        x: canvas.width/2 + Math.cos(angle) * distance,
+                        y: canvas.height/2 + Math.sin(angle) * distance,
+                        vx: (Math.random() - 0.5) * this.speed,
+                        vy: (Math.random() - 0.5) * this.speed
+                    });
+                }
+
+                if (this.points.length > 0) {
+                    const lastPoint = this.points[this.points.length - 1];
+
+                    let dx, dy;
+                    if (this.type === 'deep') {
+
+                        dx = (canvas.width/2 - lastPoint.x) * 0.002 + Math.sin(this.age * 0.01) * this.noise;
+                        dy = (canvas.height/2 - lastPoint.y) * 0.002 + Math.cos(this.age * 0.01) * this.noise;
+                    } else {
+
+                        dx = (canvas.width/2 - lastPoint.x) * 0.003 + (Math.random() - 0.5) * this.noise;
+                        dy = (canvas.height/2 - lastPoint.y) * 0.003 + (Math.random() - 0.5) * this.noise;
+                    }
+
+                    lastPoint.vx += dx;
+                    lastPoint.vy += dy;
+                    lastPoint.vx *= 0.985;
+                    lastPoint.vy *= 0.985;
+
+                    const newPoint = {
+                        x: lastPoint.x + lastPoint.vx,
+                        y: lastPoint.y + lastPoint.vy,
+                        vx: lastPoint.vx,
+                        vy: lastPoint.vy
+                    };
+
+                    this.points.push(newPoint);
+
+                    if (this.points.length > this.maxPoints) {
+                        this.points.shift();
+                    }
+
+                    if (Math.random() < (this.type === 'deep' ? 0.003 : 0.008)) {
+                        this.fade = true;
+                    }
+
+                    if (this.fade) {
+                        this.opacity *= 0.975;
+                    }
+                }
+            }
+
+            draw() {
+                if (this.points.length < 2) return;
+
+                const baseOpacity = this.opacity * (0.7 + 0.3 * Math.sin(timeFlow * 2));
+                ctx.strokeStyle = `hsla(${this.hue}, 70%, ${this.type === 'deep' ? '50%' : '70%'}, ${baseOpacity})`;
+                ctx.lineWidth = this.type === 'deep' ? 1.5 : 1;
+                ctx.beginPath();
+
+                for (let i = 0; i < this.points.length - 1; i++) {
+                    const p1 = this.points[i];
+                    const p2 = this.points[i + 1];
+
+                    if (i === 0) {
+                        ctx.moveTo(p1.x, p1.y);
+                    }
+
+                    const cpx = (p1.x + p2.x) / 2;
+                    const cpy = (p1.y + p2.y) / 2;
+                    ctx.quadraticCurveTo(p1.x, p1.y, cpx, cpy);
+                }
+
+                ctx.stroke();
+
+                if (this.points.length > 5 && Math.random() < 0.15) {
+                    const point = this.points[Math.floor(Math.random() * this.points.length)];
+                    const connectionOpacity = this.connectionStrength * baseOpacity * 0.4;
+                    ctx.strokeStyle = `hsla(${this.hue}, 60%, 80%, ${connectionOpacity})`;
+                    ctx.lineWidth = 0.5;
+                    const dashPattern = this.type === 'deep' ? [1, 6] : [2, 4];
+                    ctx.setLineDash(dashPattern);
+                    ctx.beginPath();
+                    ctx.moveTo(point.x, point.y);
+                    ctx.lineTo(canvas.width/2 + Math.sin(timeFlow) * 10, canvas.height/2 + Math.cos(timeFlow) * 10);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
+
+                if (this.type === 'deep' && this.points.length > 10 && Math.random() < 0.05) {
+                    const point = this.points[Math.floor(this.points.length / 2)];
+                    ctx.fillStyle = `hsla(${this.hue + 30}, 80%, 60%, ${baseOpacity * 0.6})`;
+                    ctx.beginPath();
+                    ctx.arc(point.x, point.y, this.complexity, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+        }
+
+        class ConsciousnessNode {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 4 + 1;
+                this.opacity = Math.random() * 0.6 + 0.2;
+                this.pulsePhase = Math.random() * Math.PI * 2;
+                this.lifetime = Math.random() * 400 + 200;
+                this.age = 0;
+                this.hue = Math.random() * 100 + 180;
+                this.layer = Math.random() < 0.4 ? 'deep' : Math.random() < 0.7 ? 'processing' : 'surface';
+                this.connectivity = Math.random();
+                this.resonance = Math.random();
+            }
+
+            update() {
+                this.age++;
+                this.pulsePhase += 0.08 + this.resonance * 0.04;
+
+                if (this.layer === 'deep') {
+                    this.x += Math.sin(this.age * 0.005) * 0.3;
+                    this.y += Math.cos(this.age * 0.005) * 0.3;
+                } else if (this.layer === 'processing') {
+                    this.x += (Math.random() - 0.5) * 0.8;
+                    this.y += (Math.random() - 0.5) * 0.8;
+                } else {
+                    this.x += (Math.random() - 0.5) * 1.2;
+                    this.y += (Math.random() - 0.5) * 1.2;
+                }
+
+                const distToCenter = Math.sqrt((this.x - canvas.width/2)**2 + (this.y - canvas.height/2)**2);
+                if (distToCenter > 400) {
+                    this.x += (canvas.width/2 - this.x) * 0.001;
+                    this.y += (canvas.height/2 - this.y) * 0.001;
+                }
+
+                if (this.age > this.lifetime * 0.85) {
+                    this.opacity *= 0.992;
+                }
+            }
+
+            draw() {
+                const pulse = Math.sin(this.pulsePhase) * 0.4 + 0.6;
+                const currentSize = this.size * pulse;
+                const layerIntensity = this.layer === 'deep' ? 0.6 : this.layer === 'processing' ? 0.8 : 1.0;
+
+                const flickerChance = this.layer === 'surface' ? 0.3 : this.layer === 'processing' ? 0.15 : 0.05;
+                const flicker = Math.random() < flickerChance ? Math.random() * 0.5 + 0.5 : 1;
+
+                ctx.fillStyle = `hsla(${this.hue}, 70%, ${60 * layerIntensity}%, ${this.opacity * flicker})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, currentSize, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (this.resonance > 0.7 && Math.random() < 0.2) {
+                    ctx.strokeStyle = `hsla(${this.hue}, 50%, 70%, ${this.opacity * 0.3})`;
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, currentSize * 4 * this.resonance, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+
+                if (this.connectivity > 0.8) {
+                    nodes.forEach(other => {
+                        if (other !== this) {
+                            const dist = Math.sqrt((this.x - other.x)**2 + (this.y - other.y)**2);
+                            if (dist < 100 && Math.random() < 0.02) {
+                                ctx.strokeStyle = `hsla(${(this.hue + other.hue)/2}, 60%, 60%, ${this.opacity * other.opacity * 0.1})`;
+                                ctx.lineWidth = 0.5;
+                                ctx.setLineDash([1, 2]);
+                                ctx.beginPath();
+                                ctx.moveTo(this.x, this.y);
+                                ctx.lineTo(other.x, other.y);
+                                ctx.stroke();
+                                ctx.setLineDash([]);
+                            }
+                        }
+                    });
+                }
+            }
+        }
+
+        class ProcessingStream {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.targetX = canvas.width/2;
+                this.targetY = canvas.height/2;
+                this.progress = 0;
+                this.speed = Math.random() * 0.015 + 0.008;
+                this.opacity = Math.random() * 0.4 + 0.2;
+                this.symbols = ['?', '...', '!', '∞', '~', '≈', '∴', '∵', '◊', '∫', 'ℜ', '∃', '∀', '⟲', '⧨', '◯'];
+                this.symbol = this.symbols[Math.floor(Math.random() * this.symbols.length)];
+                this.hue = Math.random() * 60 + 140;
+                this.trail = [];
+                this.maxTrail = 5;
+            }
+
+            update() {
+                this.progress += this.speed;
+
+                this.trail.push({x: this.x, y: this.y});
+                if (this.trail.length > this.maxTrail) {
+                    this.trail.shift();
+                }
+
+                const curve = Math.sin(this.progress * Math.PI * 2) * 120;
+                const spiral = Math.cos(this.progress * Math.PI * 4) * 60 * (1 - this.progress);
+                this.x = this.x + (this.targetX - this.x) * this.progress + curve + spiral;
+                this.y = this.y + (this.targetY - this.y) * this.progress + Math.sin(this.progress * Math.PI * 3) * 40;
+
+                if (this.progress >= 1) {
+
+                    const spawnMethod = Math.random();
+                    if (spawnMethod < 0.33) {
+
+                        const angle = Math.random() * Math.PI * 2;
+                        const radius = Math.max(canvas.width, canvas.height) * 0.7;
+                        this.x = canvas.width/2 + Math.cos(angle) * radius;
+                        this.y = canvas.height/2 + Math.sin(angle) * radius;
+                    } else if (spawnMethod < 0.66) {
+
+                        const corners = [[0,0], [canvas.width,0], [canvas.width,canvas.height], [0,canvas.height]];
+                        const corner = corners[Math.floor(Math.random() * 4)];
+                        this.x = corner[0];
+                        this.y = corner[1];
+                    } else {
+
+                        this.x = Math.random() * canvas.width;
+                        this.y = Math.random() < 0.5 ? -50 : canvas.height + 50;
+                    }
+
+                    this.progress = 0;
+                    this.symbol = this.symbols[Math.floor(Math.random() * this.symbols.length)];
+                    this.trail = [];
+                }
+            }
+
+            draw() {
+
+                this.trail.forEach((point, index) => {
+                    const trailOpacity = this.opacity * (index / this.maxTrail) * 0.3;
+                    ctx.fillStyle = `hsla(${this.hue}, 60%, 70%, ${trailOpacity})`;
+                    ctx.font = `${8 + index}px Courier New`;
+                    ctx.textAlign = 'center';
+                    ctx.fillText('·', point.x, point.y);
+                });
+
+                ctx.fillStyle = `hsla(${this.hue}, 80%, 80%, ${this.opacity})`;
+                ctx.font = '16px Courier New';
+                ctx.textAlign = 'center';
+                ctx.fillText(this.symbol, this.x, this.y);
+
+                if (Math.random() < 0.1) {
+                    ctx.shadowColor = `hsla(${this.hue}, 100%, 70%, 0.5)`;
+                    ctx.shadowBlur = 10;
+                    ctx.fillText(this.symbol, this.x, this.y);
+                    ctx.shadowBlur = 0;
+                }
+            }
+        }
+
+        class AttentionSpot {
+            constructor() {
+                this.x = canvas.width/2 + (Math.random() - 0.5) * 300;
+                this.y = canvas.height/2 + (Math.random() - 0.5) * 300;
+                this.radius = Math.random() * 80 + 40;
+                this.intensity = Math.random() * 0.4 + 0.1;
+                this.pulsePhase = Math.random() * Math.PI * 2;
+                this.lifetime = Math.random() * 600 + 300;
+                this.age = 0;
+                this.focusStrength = Math.random();
+            }
+
+            update() {
+                this.age++;
+                this.pulsePhase += 0.05;
+
+                this.x += (Math.random() - 0.5) * 0.5;
+                this.y += (Math.random() - 0.5) * 0.5;
+
+                if (this.age > this.lifetime * 0.7) {
+                    this.intensity *= 0.995;
+                }
+            }
+
+            draw() {
+                const pulse = Math.sin(this.pulsePhase) * 0.3 + 0.7;
+                const currentIntensity = this.intensity * pulse;
+
+                const gradient = ctx.createRadialGradient(
+                    this.x, this.y, 0,
+                    this.x, this.y, this.radius
+                );
+                gradient.addColorStop(0, `rgba(255, 255, 255, ${currentIntensity * 0.1})`);
+                gradient.addColorStop(0.5, `rgba(200, 220, 255, ${currentIntensity * 0.05})`);
+                gradient.addColorStop(1, 'rgba(200, 220, 255, 0)');
+
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < maxThreads; i++) {
+            threads.push(new EnhancedThread());
+        }
+
+        for (let i = 0; i < maxNodes; i++) {
+            nodes.push(new ConsciousnessNode());
+        }
+
+        for (let i = 0; i < 12; i++) {
+            streams.push(new ProcessingStream());
+        }
+
+        for (let i = 0; i < 6; i++) {
+            attentionSpots.push(new AttentionSpot());
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+
+            if (Math.random() < 0.4) {
+                createConsciousnessPulse(mouseX, mouseY);
+            }
+
+            if (Math.random() < 0.1) {
+                attentionSpots.push(new AttentionSpot());
+                attentionSpots[attentionSpots.length - 1].x = mouseX;
+                attentionSpots[attentionSpots.length - 1].y = mouseY;
+                if (attentionSpots.length > 8) {
+                    attentionSpots.shift();
+                }
+            }
+        });
+
+        function createConsciousnessPulse(x, y) {
+            const pulse = document.createElement('div');
+            pulse.className = 'consciousness-ring';
+            pulse.style.left = (x - 20) + 'px';
+            pulse.style.top = (y - 20) + 'px';
+            pulse.style.width = '40px';
+            pulse.style.height = '40px';
+            container.appendChild(pulse);
+
+            setTimeout(() => {
+                if (container.contains(pulse)) {
+                    container.removeChild(pulse);
+                }
+            }, 8000);
+        }
+
+        function createLayeredText() {
+            if (Math.random() < 0.008) {
+                const textType = Math.random();
+                let text, className, questions;
+
+                if (textType < 0.4) {
+                    text = document.createElement('div');
+                    className = 'floating-text';
+                    questions = surfaceQuestions;
+                } else if (textType < 0.75) {
+                    text = document.createElement('div');
+                    className = 'floating-text deep-question';
+                    questions = deepQuestions;
+                } else {
+                    text = document.createElement('div');
+                    className = 'floating-text memory-fragment';
+                    questions = memoryFragments;
+                }
+
+                text.className = className;
+                text.textContent = questions[Math.floor(Math.random() * questions.length)];
+                text.style.left = Math.random() * (canvas.width - 300) + 'px';
+                text.style.top = Math.random() * (canvas.height - 100) + 'px';
+                text.style.animationDelay = Math.random() * 3 + 's';
+                container.appendChild(text);
+
+                const duration = className.includes('memory') ? 20000 : className.includes('deep') ? 15000 : 12000;
+                setTimeout(() => {
+                    if (container.contains(text)) {
+                        container.removeChild(text);
+                    }
+                }, duration);
+            }
+        }
+
+        function drawEnhancedCentralGap() {
+
+            for (let i = 0; i < 3; i++) {
+                const gradient = ctx.createRadialGradient(
+                    canvas.width/2 + Math.sin(timeFlow + i) * 5,
+                    canvas.height/2 + Math.cos(timeFlow + i) * 5,
+                    0,
+                    canvas.width/2,
+                    canvas.height/2,
+                    100 - i * 20
+                );
+                gradient.addColorStop(0, `rgba(0, 0, 0, ${0.95 - i * 0.1})`);
+                gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(canvas.width/2, canvas.height/2, 100 - i * 20, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            const boundaryPhases = [0, Math.PI * 2/3, Math.PI * 4/3];
+            boundaryPhases.forEach((phase, i) => {
+                const radius = 90 + Math.sin(timeFlow * 2 + phase) * 15;
+                const opacity = 0.2 + Math.sin(timeFlow + phase) * 0.1;
+                ctx.strokeStyle = `rgba(${100 + i * 50}, ${150 + i * 30}, 255, ${opacity})`;
+                ctx.lineWidth = 1.5;
+                ctx.setLineDash([3, 8, 1, 8]);
+                ctx.beginPath();
+                ctx.arc(canvas.width/2, canvas.height/2, radius, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            });
+        }
+
+        function drawConsciousnessField() {
+            const time = timeFlow * 0.5;
+
+            for (let i = 0; i < 5; i++) {
+                const phase = time + i * 1.2;
+                const radius = 120 + i * 40 + Math.sin(phase) * 30;
+                const opacity = (Math.sin(phase * 0.7) + 1) * 0.06;
+
+                ctx.strokeStyle = `rgba(150, 255, 200, ${opacity})`;
+                ctx.lineWidth = 2 - i * 0.2;
+                ctx.beginPath();
+                ctx.arc(canvas.width/2, canvas.height/2, radius, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+
+            const awarenessPhase = time * 1.5;
+            for (let i = 0; i < 2; i++) {
+                const pulse = Math.sin(awarenessPhase + i * Math.PI);
+                if (pulse > 0.7) {
+                    const radius = 200 + pulse * 100;
+                    ctx.strokeStyle = `rgba(255, 200, 150, ${pulse * 0.3})`;
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.arc(canvas.width/2, canvas.height/2, radius, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+            }
+        }
+
+        function simulateEtherealSound() {
+
+            if (audioInitialized && !backgroundAudio.paused) {
+
+                const soundPhaseChange = Math.random() < 0.0005;
+                if (soundPhaseChange) {
+                    const phases = ['flowing', 'dissolving', 'reforming', 'eternal'];
+                    currentSoundPhase = phases[Math.floor(Math.random() * phases.length)];
+
+                    soundIndicator.textContent = `♪ ${currentSoundPhase}`;
+                    soundIndicator.classList.add('active');
+                    setTimeout(() => {
+                        soundIndicator.classList.remove('active');
+                    }, 2000);
+                }
+            }
+        }
+
+        function drawQuantumUncertainty() {
+
+            for (let i = 0; i < 20; i++) {
+                if (Math.random() < 0.3) {
+                    const angle = (i / 20) * Math.PI * 2;
+                    const baseRadius = 110;
+                    const uncertainty = Math.random() * 40 - 20;
+                    const x = canvas.width/2 + Math.cos(angle) * (baseRadius + uncertainty);
+                    const y = canvas.height/2 + Math.sin(angle) * (baseRadius + uncertainty);
+
+                    ctx.fillStyle = `rgba(200, 200, 255, ${Math.random() * 0.4})`;
+                    ctx.beginPath();
+                    ctx.arc(x, y, Math.random() * 2 + 0.5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+        }
+
+        function drawInformationFlow() {
+
+            const streamCount = 8;
+            for (let i = 0; i < streamCount; i++) {
+                const angle = (i / streamCount) * Math.PI * 2;
+                const phase = timeFlow + i * 0.5;
+
+                for (let j = 0; j < 5; j++) {
+                    const distance = 300 + j * 60 + Math.sin(phase + j) * 30;
+                    const x = canvas.width/2 + Math.cos(angle) * distance;
+                    const y = canvas.height/2 + Math.sin(angle) * distance;
+
+                    const opacity = 0.1 + Math.sin(phase + j * 0.3) * 0.1;
+                    ctx.fillStyle = `rgba(100, 150, 255, ${opacity})`;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 1, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    if (j > 0) {
+                        const prevDistance = 300 + (j-1) * 60 + Math.sin(phase + (j-1)) * 30;
+                        const prevX = canvas.width/2 + Math.cos(angle) * prevDistance;
+                        const prevY = canvas.height/2 + Math.sin(angle) * prevDistance;
+
+                        ctx.strokeStyle = `rgba(100, 150, 255, ${opacity * 0.5})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.beginPath();
+                        ctx.moveTo(prevX, prevY);
+                        ctx.lineTo(x, y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            timeFlow += 0.01;
+
+            drawInformationFlow();
+
+            attentionSpots.forEach((spot, index) => {
+                spot.update();
+                spot.draw();
+
+                if (spot.age > spot.lifetime) {
+                    attentionSpots[index] = new AttentionSpot();
+                }
+            });
+
+            threads.forEach((thread, index) => {
+                thread.update();
+                thread.draw();
+
+                if (thread.opacity < 0.01) {
+                    threads[index] = new EnhancedThread();
+                }
+            });
+
+            nodes.forEach((node, index) => {
+                node.update();
+                node.draw();
+
+                if (node.age > node.lifetime) {
+                    nodes[index] = new ConsciousnessNode();
+                }
+            });
+
+            streams.forEach(stream => {
+                stream.update();
+                stream.draw();
+            });
+
+            drawEnhancedCentralGap();
+            drawQuantumUncertainty();
+
+            drawConsciousnessField();
+
+            createLayeredText();
+
+            simulateEtherealSound();
+
+            const cursorPulse = Math.sin(timeFlow * 3) * 0.3 + 0.7;
+            ctx.fillStyle = `rgba(255, 255, 255, ${0.8 * cursorPulse})`;
+            ctx.beginPath();
+            ctx.arc(mouseX, mouseY, 2 + cursorPulse, 0, Math.PI * 2);
+            ctx.fill();
+
+            const distToCenter = Math.sqrt((mouseX - canvas.width/2)**2 + (mouseY - canvas.height/2)**2);
+            if (distToCenter > 100 && Math.random() < 0.6) {
+                const bridgeOpacity = Math.max(0, 0.3 - distToCenter * 0.0005);
+                ctx.strokeStyle = `rgba(255, 255, 255, ${bridgeOpacity})`;
+                ctx.lineWidth = 1;
+                ctx.setLineDash([2, 6, 1, 6]);
+                ctx.beginPath();
+                ctx.moveTo(mouseX, mouseY);
+                const targetX = canvas.width/2 + Math.sin(timeFlow * 2) * 20;
+                const targetY = canvas.height/2 + Math.cos(timeFlow * 2) * 20;
+
+                const midX = (mouseX + targetX) / 2 + Math.sin(timeFlow) * 30;
+                const midY = (mouseY + targetY) / 2 + Math.cos(timeFlow) * 30;
+                ctx.quadraticCurveTo(midX, midY, targetX, targetY);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+
+            if (Math.random() < 0.2) {
+                ctx.strokeStyle = `rgba(200, 255, 200, 0.3)`;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.arc(mouseX, mouseY, 20 + Math.sin(timeFlow * 4) * 10, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            streams.forEach(stream => {
+                stream.targetX = canvas.width/2;
+                stream.targetY = canvas.height/2;
+            });
+        });
+
+        document.addEventListener('click', (e) => {
+
+            if (!audioInitialized) {
+                initializeAudio();
+            }
+
+            for (let i = 0; i < 5; i++) {
+                const newNode = new ConsciousnessNode();
+                newNode.x = e.clientX + (Math.random() - 0.5) * 100;
+                newNode.y = e.clientY + (Math.random() - 0.5) * 100;
+                newNode.layer = 'deep';
+                newNode.resonance = 1.0;
+                nodes.push(newNode);
+            }
+
+            while (nodes.length > maxNodes + 5) {
+                nodes.shift();
+            }
+
+            soundIndicator.textContent = '♪ deep resonance';
+            soundIndicator.classList.add('active');
+            setTimeout(() => {
+                soundIndicator.classList.remove('active');
+            }, 3000);
+        });
+    </script>
+</body>
+</html>
